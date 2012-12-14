@@ -42,7 +42,7 @@ static UIFont *buttonFont = nil;
         CGRect frame = parentView.bounds;
         
         _view = [[UIView alloc] initWithFrame:frame];
-        _blocks = [[NSMutableArray alloc] init];
+        _buttons = [[NSMutableArray alloc] init];
         _height = kActionSheetTopMargin;
 
         if (title)
@@ -75,75 +75,93 @@ static UIFont *buttonFont = nil;
 - (void) dealloc 
 {
     [_view release];
-    [_blocks release];
+    [_buttons release];
     [super dealloc];
 }
 
 - (NSUInteger)buttonCount
 {
-    return _blocks.count;
+    return _buttons.count;
 }
 
-- (void)addButtonWithTitle:(NSString *)title color:(NSString*)color block:(void (^)())block atIndex:(NSInteger)index
+#define ButtonProperty_ActionBlock @"ActionBlock"
+#define ButtonProperty_Type @"Type"
+#define ButtonProperty_Title @"Title"
+
+- (void)addButtonWithTitle:(NSString *)title type:(BlockActionSheetButtonType)type block:(void (^)())block atIndex:(NSInteger)index
 {
+    NSDictionary *buttonProperties = [NSDictionary dictionaryWithObjectsAndKeys:
+                                      block ? [[block copy] autorelease] : [NSNull null], ButtonProperty_ActionBlock,
+                                      [NSNumber numberWithInt:type], ButtonProperty_Type,
+                                      title, ButtonProperty_Title,
+                                      nil];
+    
     if (index >= 0)
     {
-        [_blocks insertObject:[NSArray arrayWithObjects:
-                               block ? [[block copy] autorelease] : [NSNull null],
-                               title,
-                               color,
-                               nil]
-                      atIndex:index];
+        [_buttons insertObject:buttonProperties
+                       atIndex:index];
     }
     else
     {
-        [_blocks addObject:[NSArray arrayWithObjects:
-                            block ? [[block copy] autorelease] : [NSNull null],
-                            title,
-                            color,
-                            nil]];
+        [_buttons addObject:buttonProperties];
     }
 }
 
 - (void)setDestructiveButtonWithTitle:(NSString *)title block:(void (^)())block
 {
-    [self addButtonWithTitle:title color:@"red" block:block atIndex:-1];
+    [self addButtonWithTitle:title type:BlockActionSheetButtonTypeDestructive block:block atIndex:-1];
 }
 
 - (void)setCancelButtonWithTitle:(NSString *)title block:(void (^)())block
 {
-    [self addButtonWithTitle:title color:@"black" block:block atIndex:-1];
+    [self addButtonWithTitle:title type:BlockActionSheetButtonTypeCancel block:block atIndex:-1];
 }
 
 - (void)addButtonWithTitle:(NSString *)title block:(void (^)())block 
 {
-    [self addButtonWithTitle:title color:@"gray" block:block atIndex:-1];
+    [self addButtonWithTitle:title type:BlockActionSheetButtonTypeNormal block:block atIndex:-1];
 }
 
 - (void)setDestructiveButtonWithTitle:(NSString *)title atIndex:(NSInteger)index block:(void (^)())block
 {
-    [self addButtonWithTitle:title color:@"red" block:block atIndex:index];
+    [self addButtonWithTitle:title type:BlockActionSheetButtonTypeDestructive block:block atIndex:index];
 }
 
 - (void)setCancelButtonWithTitle:(NSString *)title atIndex:(NSInteger)index block:(void (^)())block
 {
-    [self addButtonWithTitle:title color:@"black" block:block atIndex:index];
+    [self addButtonWithTitle:title type:BlockActionSheetButtonTypeCancel block:block atIndex:index];
 }
 
 - (void)addButtonWithTitle:(NSString *)title atIndex:(NSInteger)index block:(void (^)())block 
 {
-    [self addButtonWithTitle:title color:@"gray" block:block atIndex:index];
+    [self addButtonWithTitle:title type:BlockActionSheetButtonTypeNormal block:block atIndex:index];
+}
+
+- (NSString *)imageNameForType:(BlockActionSheetButtonType)type {
+    NSString *color = nil;
+    switch (type) {
+        case BlockActionSheetButtonTypeNormal:
+            color = @"gray";
+            break;
+        case BlockActionSheetButtonTypeCancel:
+            color = @"black";
+            break;
+        case BlockActionSheetButtonTypeDestructive:
+            color = @"red";
+            break;
+    }
+    return [NSString stringWithFormat:@"action-%@-button.png", color];
 }
 
 - (void)showInView:(UIView *)view
 {
     NSUInteger i = 1;
-    for (NSArray *block in _blocks)
+    for (NSDictionary *buttonProperties in _buttons)
     {
-        NSString *title = [block objectAtIndex:1];
-        NSString *color = [block objectAtIndex:2];
+        NSString *title = [buttonProperties objectForKey:ButtonProperty_Title];
+        ButtonType type = (ButtonType) [(NSNumber *) [buttonProperties objectForKey:ButtonProperty_Type] intValue];
         
-        UIImage *image = [UIImage imageNamed:[NSString stringWithFormat:@"action-%@-button.png", color]];
+        UIImage *image = [UIImage imageNamed:[self imageNameForType:type]];
         image = [image stretchableImageWithLeftCapWidth:(int)(image.size.width)>>1 topCapHeight:0];
         
         UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
@@ -205,9 +223,9 @@ static UIFont *buttonFont = nil;
 
 - (void)dismissWithClickedButtonIndex:(NSInteger)buttonIndex animated:(BOOL)animated 
 {
-    if (buttonIndex >= 0 && buttonIndex < [_blocks count])
+    if (buttonIndex >= 0 && buttonIndex < [_buttons count])
     {
-        id obj = [[_blocks objectAtIndex: buttonIndex] objectAtIndex:0];
+        id obj = [[_buttons objectAtIndex:buttonIndex] objectForKey:ButtonProperty_ActionBlock];
         if (![obj isEqual:[NSNull null]])
         {
             ((void (^)())obj)();
