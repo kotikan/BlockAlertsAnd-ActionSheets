@@ -84,18 +84,18 @@ static UIFont *buttonFont = nil;
     return _buttons.count;
 }
 
-#define ButtonProperty_ActionBlock @"ActionBlock"
-#define ButtonProperty_Type @"Type"
-#define ButtonProperty_Title @"Title"
-
 - (void)addButtonWithTitle:(NSString *)title type:(BlockActionSheetButtonType)type block:(void (^)())block atIndex:(NSInteger)index
 {
     NSDictionary *buttonProperties = [NSDictionary dictionaryWithObjectsAndKeys:
-                                      block ? [[block copy] autorelease] : [NSNull null], ButtonProperty_ActionBlock,
-                                      [NSNumber numberWithInt:type], ButtonProperty_Type,
-                                      title, ButtonProperty_Title,
-                                      nil];
-    
+            block ? [[block copy] autorelease] : [NSNull null], BlockActionSheet_ButtonProperty_ActionBlock,
+            [NSNumber numberWithInt:type], BlockActionSheet_ButtonProperty_Type,
+            title, BlockActionSheet_ButtonProperty_Title,
+            nil];
+
+    [self addButtonWithProperties:buttonProperties atIndex:index];
+}
+
+- (void)addButtonWithProperties:(NSDictionary *)buttonProperties atIndex:(NSInteger)index {
     if (index >= 0)
     {
         [_buttons insertObject:buttonProperties
@@ -155,34 +155,13 @@ static UIFont *buttonFont = nil;
 
 - (void)showInView:(UIView *)view
 {
-    NSUInteger i = 1;
+    NSUInteger tag = 1;
     for (NSDictionary *buttonProperties in _buttons)
     {
-        NSString *title = [buttonProperties objectForKey:ButtonProperty_Title];
-        ButtonType type = (ButtonType) [(NSNumber *) [buttonProperties objectForKey:ButtonProperty_Type] intValue];
-        
-        UIImage *image = [UIImage imageNamed:[self imageNameForType:type]];
-        image = [image stretchableImageWithLeftCapWidth:(int)(image.size.width)>>1 topCapHeight:0];
-        
-        UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
-        button.frame = CGRectMake(kActionSheetBorder, _height, _view.bounds.size.width-kActionSheetBorder*2, kActionSheetButtonHeight);
-        button.titleLabel.font = buttonFont;
-        button.titleLabel.minimumFontSize = 6;
-        button.titleLabel.adjustsFontSizeToFitWidth = YES;
-        button.titleLabel.textAlignment = UITextAlignmentCenter;
-        button.titleLabel.shadowOffset = kActionSheetButtonShadowOffset;
-        button.backgroundColor = [UIColor clearColor];
-        button.tag = i++;
-        
-        [button setBackgroundImage:image forState:UIControlStateNormal];
-        [button setTitleColor:kActionSheetButtonTextColor forState:UIControlStateNormal];
-        [button setTitleShadowColor:kActionSheetButtonShadowColor forState:UIControlStateNormal];
-        [button setTitle:title forState:UIControlStateNormal];
-        button.accessibilityLabel = title;
-        
+        UIButton *button = [self buttonWithProperties:buttonProperties tag:tag++];
         [button addTarget:self action:@selector(buttonClicked:) forControlEvents:UIControlEventTouchUpInside];
-        
         [_view addSubview:button];
+        button.frame = CGRectMake(kActionSheetBorder, _height, _view.bounds.size.width-kActionSheetBorder*2, kActionSheetButtonHeight);
         _height += kActionSheetButtonHeight + kActionSheetBorder;
     }
     
@@ -221,11 +200,37 @@ static UIFont *buttonFont = nil;
     [self retain];
 }
 
+- (UIButton *)buttonWithProperties:(NSDictionary *)buttonProperties tag:(NSUInteger)tag {
+    NSString *title = [buttonProperties objectForKey:BlockActionSheet_ButtonProperty_Title];
+    BlockActionSheetButtonType type = (BlockActionSheetButtonType)[(NSNumber *) [buttonProperties objectForKey:BlockActionSheet_ButtonProperty_Type] intValue];
+
+    UIImage *image = [UIImage imageNamed:[self imageNameForType:type]];
+    image = [image stretchableImageWithLeftCapWidth:(int)(image.size.width)>>1 topCapHeight:0];
+
+    UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
+    button.frame = CGRectMake(kActionSheetBorder, _height, _view.bounds.size.width-kActionSheetBorder*2, kActionSheetButtonHeight);
+    button.titleLabel.font = buttonFont;
+    button.titleLabel.minimumFontSize = 6;
+    button.titleLabel.adjustsFontSizeToFitWidth = YES;
+    button.titleLabel.textAlignment = UITextAlignmentCenter;
+    button.titleLabel.shadowOffset = kActionSheetButtonShadowOffset;
+    button.backgroundColor = [UIColor clearColor];
+    button.tag = tag;
+
+    [button setBackgroundImage:image forState:UIControlStateNormal];
+    [button setTitleColor:kActionSheetButtonTextColor forState:UIControlStateNormal];
+    [button setTitleShadowColor:kActionSheetButtonShadowColor forState:UIControlStateNormal];
+    [button setTitle:title forState:UIControlStateNormal];
+    button.accessibilityLabel = title;
+
+    return button;
+}
+
 - (void)dismissWithClickedButtonIndex:(NSInteger)buttonIndex animated:(BOOL)animated 
 {
     if (buttonIndex >= 0 && buttonIndex < [_buttons count])
     {
-        id obj = [[_buttons objectAtIndex:buttonIndex] objectForKey:ButtonProperty_ActionBlock];
+        id obj = [[_buttons objectAtIndex:buttonIndex] objectForKey:BlockActionSheet_ButtonProperty_ActionBlock];
         if (![obj isEqual:[NSNull null]])
         {
             ((void (^)())obj)();

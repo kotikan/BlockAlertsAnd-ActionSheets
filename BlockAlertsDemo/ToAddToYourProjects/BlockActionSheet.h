@@ -11,6 +11,10 @@ typedef enum {
     BlockActionSheetButtonTypeDestructive
 } BlockActionSheetButtonType;
 
+#define BlockActionSheet_ButtonProperty_Type @"Type"
+#define BlockActionSheet_ButtonProperty_Title @"Title"
+#define BlockActionSheet_ButtonProperty_ActionBlock @"ActionBlock"
+
 typedef void (^ActionBlock)();
 
 /**
@@ -34,12 +38,18 @@ typedef void (^ActionBlock)();
 - (void)setDestructiveButtonWithTitle:(NSString *) title block:(ActionBlock) block;
 - (void)addButtonWithTitle:(NSString *) title block:(ActionBlock) block;
 
+- (void)addButtonWithProperties:(NSDictionary *)buttonProperties atIndex:(NSInteger)index;
+
 - (void)setCancelButtonWithTitle:(NSString *) title atIndex:(NSInteger)index block:(ActionBlock) block;
 - (void)setDestructiveButtonWithTitle:(NSString *) title atIndex:(NSInteger)index block:(ActionBlock) block;
 - (void)addButtonWithTitle:(NSString *) title atIndex:(NSInteger)index block:(ActionBlock) block;
 
 - (void)showInView:(UIView *)view;
-
 - (NSUInteger)buttonCount;
+
+/**
+* Subclasses can override this method to provide a custom style of button
+*/
+- (UIButton *)buttonWithProperties:(NSDictionary *)buttonProperties tag:(NSUInteger)tag;
 
 @end
