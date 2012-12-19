@@ -29,6 +29,7 @@ typedef void (^ActionBlock)();
 
 @property (nonatomic, readonly) UIView *view;
 @property (nonatomic, readwrite) BOOL vignetteBackground;
+@property (nonatomic, readonly) BOOL isVisible;
 
 + (id)sheetWithTitle:(NSString *)title;
 

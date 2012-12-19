@@ -7,6 +7,12 @@
 #import "BlockBackground.h"
 #import "BlockUI.h"
 
+@interface BlockActionSheet ()
+
+@property (nonatomic, readwrite) BOOL isVisible;
+
+@end
+
 @implementation BlockActionSheet
 
 @synthesize view = _view;
@@ -155,6 +161,7 @@ static UIFont *buttonFont = nil;
 
 - (void)showInView:(UIView *)view
 {
+    self.isVisible = YES;
     NSUInteger tag = 1;
     for (NSDictionary *buttonProperties in _buttons)
     {
@@ -251,6 +258,7 @@ static UIFont *buttonFont = nil;
                              [[BlockBackground sharedInstance] removeView:_view];
                              [_view release]; _view = nil;
                              [self autorelease];
+                             self.isVisible = NO;
                          }];
     }
     else
@@ -258,6 +266,7 @@ static UIFont *buttonFont = nil;
         [[BlockBackground sharedInstance] removeView:_view];
         [_view release]; _view = nil;
         [self autorelease];
+        self.isVisible = NO;
     }
 }
 
