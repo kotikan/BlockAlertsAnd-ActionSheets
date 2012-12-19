@@ -255,19 +255,21 @@ static UIFont *buttonFont = nil;
                              _view.center = center;
                              [[BlockBackground sharedInstance] reduceAlphaIfEmpty];
                          } completion:^(BOOL finished) {
-                             [[BlockBackground sharedInstance] removeView:_view];
-                             [_view release]; _view = nil;
-                             [self autorelease];
-                             self.isVisible = NO;
+                             [self tearDownSheet];
                          }];
     }
     else
     {
-        [[BlockBackground sharedInstance] removeView:_view];
-        [_view release]; _view = nil;
-        [self autorelease];
-        self.isVisible = NO;
+        [self tearDownSheet];
     }
+}
+
+- (void)tearDownSheet {
+    [[BlockBackground sharedInstance] removeView:_view];
+    [_view release];
+    _view = nil;
+    [self autorelease];
+    self.isVisible = NO;
 }
 
 #pragma mark - Action
