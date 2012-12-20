@@ -47,6 +47,7 @@ typedef void (^ActionBlock)();
 
 - (void)showInView:(UIView *)view;
 - (NSUInteger)buttonCount;
+- (void)tearDownSheet;
 
 /**
 * Subclasses can override this method to provide a custom style of button

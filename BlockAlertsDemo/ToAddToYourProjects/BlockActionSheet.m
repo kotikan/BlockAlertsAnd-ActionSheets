@@ -13,7 +13,9 @@
 
 @end
 
-@implementation BlockActionSheet
+@implementation BlockActionSheet {
+    BOOL isClosing;
+}
 
 @synthesize view = _view;
 @synthesize vignetteBackground = _vignetteBackground;
@@ -265,6 +267,10 @@ static UIFont *buttonFont = nil;
 }
 
 - (void)tearDownSheet {
+    if (isClosing) {
+        return;
+    }
+    isClosing = YES;
     [[BlockBackground sharedInstance] removeView:_view];
     [_view release];
     _view = nil;
