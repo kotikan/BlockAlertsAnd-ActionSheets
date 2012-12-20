@@ -46,7 +46,6 @@ typedef void (^ActionBlock)();
 - (void)addButtonWithTitle:(NSString *) title atIndex:(NSInteger)index block:(ActionBlock) block;
 
 - (void)showInView:(UIView *)view;
-- (void)tearDownSheet;
 - (NSUInteger)buttonCount;
 
 /**
