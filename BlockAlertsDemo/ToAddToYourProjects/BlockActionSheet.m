@@ -235,19 +235,8 @@ static UIFont *buttonFont = nil;
     return button;
 }
 
-- (void)dismissWithClickedButtonIndex:(NSInteger)buttonIndex animated:(BOOL)animated 
-{
-    if (buttonIndex >= 0 && buttonIndex < [_buttons count])
-    {
-        id obj = [[_buttons objectAtIndex:buttonIndex] objectForKey:BlockActionSheet_ButtonProperty_ActionBlock];
-        if (![obj isEqual:[NSNull null]])
-        {
-            ((void (^)())obj)();
-        }
-    }
-    
-    if (animated)
-    {
+- (void)dismissWithClickedButtonIndex:(NSInteger)buttonIndex animated:(BOOL)animated {
+    if (animated) {
         CGPoint center = _view.center;
         center.y += _view.bounds.size.height;
         [UIView animateWithDuration:0.4
@@ -256,13 +245,26 @@ static UIFont *buttonFont = nil;
                          animations:^{
                              _view.center = center;
                              [[BlockBackground sharedInstance] reduceAlphaIfEmpty];
-                         } completion:^(BOOL finished) {
+                         }
+                         completion:^(BOOL finished) {
                              [self tearDownSheet];
-                         }];
+                             [self performBlockForButtonIndex:buttonIndex];
+                         }
+        ];
     }
-    else
-    {
+    else {
         [self tearDownSheet];
+    }
+}
+
+- (void)performBlockForButtonIndex:(NSInteger)buttonIndex {
+    if (buttonIndex >= 0 && buttonIndex < [_buttons count])
+    {
+        id obj = [[_buttons objectAtIndex:buttonIndex] objectForKey:BlockActionSheet_ButtonProperty_ActionBlock];
+        if (![obj isEqual:[NSNull null]])
+        {
+            ((void (^)())obj)();
+        }
     }
 }
 
