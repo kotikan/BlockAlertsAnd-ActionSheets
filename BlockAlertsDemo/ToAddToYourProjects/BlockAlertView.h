@@ -4,6 +4,7 @@
 //
 
 #import <UIKit/UIKit.h>
+@class BlockAlertViewStyle;
 
 @interface BlockAlertView : NSObject {
 @protected
@@ -15,6 +16,7 @@
 + (BlockAlertView *)alertWithTitle:(NSString *)title message:(NSString *)message;
 
 - (id)initWithTitle:(NSString *)title message:(NSString *)message;
+- (id)initWithTitle:(NSString *)title message:(NSString *)message style:(BlockAlertViewStyle *)style;
 
 - (void)setDestructiveButtonWithTitle:(NSString *)title block:(void (^)())block;
 - (void)setCancelButtonWithTitle:(NSString *)title block:(void (^)())block;
@@ -26,5 +28,6 @@
 @property (nonatomic, retain) UIImage *backgroundImage;
 @property (nonatomic, readonly) UIView *view;
 @property (nonatomic, readwrite) BOOL vignetteBackground;
+@property (nonatomic, retain) BlockAlertViewStyle *alertViewStyle;
 
 @end

@@ -6,6 +6,7 @@
 #import "BlockActionSheet.h"
 #import "BlockBackground.h"
 #import "BlockUI.h"
+#import "BlockActionSheetStyle.h"
 
 @interface BlockActionSheet ()
 
@@ -19,6 +20,7 @@
 
 @synthesize view = _view;
 @synthesize vignetteBackground = _vignetteBackground;
+@synthesize actionSheetStyle = _actionSheetStyle;
 
 static UIImage *background = nil;
 static UIFont *titleFont = nil;
@@ -26,48 +28,58 @@ static UIFont *buttonFont = nil;
 
 #pragma mark - init
 
-+ (void)initialize
-{
-    if (self == [BlockActionSheet class])
-    {
-        background = [UIImage imageNamed:kActionSheetBackground];
-        background = [[background stretchableImageWithLeftCapWidth:0 topCapHeight:kActionSheetBackgroundCapHeight] retain];
-        titleFont = [kActionSheetTitleFont retain];
-        buttonFont = [kActionSheetButtonFont retain];
-    }
-}
-
 + (id)sheetWithTitle:(NSString *)title
 {
     return [[[BlockActionSheet alloc] initWithTitle:title] autorelease];
 }
 
-- (id)initWithTitle:(NSString *)title 
++ (id)sheetWithTitle:(NSString *)title andStyle:(BlockActionSheetStyle *)style
+{
+    return [[BlockActionSheet alloc] initWithTitle:title andStyle:style];
+}
+
+- (id)initWithTitle:(NSString *)title
+{
+    BlockActionSheetStyle *style = [[BlockActionSheetStyle alloc] init];
+    return [self initWithTitle:title andStyle:style];
+}
+
+- (id)initWithTitle:(NSString *)title andStyle:(BlockActionSheetStyle *)style
 {
     if ((self = [super init]))
     {
+        [style retain];
+        [_actionSheetStyle release];
+        _actionSheetStyle = style;
+        
+        background = [UIImage imageNamed:[_actionSheetStyle actionSheetBackground]];
+        background = [[background stretchableImageWithLeftCapWidth:0 topCapHeight:[_actionSheetStyle actionSheetBackgroundCapHeight]] retain];
+        titleFont = [[_actionSheetStyle actionSheetTitleFont] retain];
+        buttonFont = [[_actionSheetStyle actionsheetButtonFont] retain];
+
         UIWindow *parentView = [BlockBackground sharedInstance];
         CGRect frame = parentView.bounds;
         
         _view = [[UIView alloc] initWithFrame:frame];
         _buttons = [[NSMutableArray alloc] init];
-        _height = kActionSheetTopMargin;
+        _height = [_actionSheetStyle actionSheetTopMargin];
 
         if (title)
         {
+            CGFloat actionSheetBorder = [_actionSheetStyle actionSheetBorder];
             CGSize size = [title sizeWithFont:titleFont
-                            constrainedToSize:CGSizeMake(frame.size.width-kActionSheetBorder*2, 1000)
+                            constrainedToSize:CGSizeMake(frame.size.width-actionSheetBorder*2, 1000)
                                 lineBreakMode:UILineBreakModeWordWrap];
             
-            UILabel *labelView = [[UILabel alloc] initWithFrame:CGRectMake(kActionSheetBorder, _height, frame.size.width-kActionSheetBorder*2, size.height)];
+            UILabel *labelView = [[UILabel alloc] initWithFrame:CGRectMake(actionSheetBorder, _height, frame.size.width-actionSheetBorder*2, size.height)];
             labelView.font = titleFont;
             labelView.numberOfLines = 0;
             labelView.lineBreakMode = UILineBreakModeWordWrap;
-            labelView.textColor = kActionSheetTitleTextColor;
+            labelView.textColor = [_actionSheetStyle actionSheetTitleTextColor];
             labelView.backgroundColor = [UIColor clearColor];
             labelView.textAlignment = UITextAlignmentCenter;
-            labelView.shadowColor = kActionSheetTitleShadowColor;
-            labelView.shadowOffset = kActionSheetTitleShadowOffset;
+            labelView.shadowColor = [_actionSheetStyle actionSheetTitleShadowColor];
+            labelView.shadowOffset = [_actionSheetStyle actionSheetTitleShadowOffset];
             labelView.text = title;
             [_view addSubview:labelView];
             [labelView release];
@@ -80,7 +92,7 @@ static UIFont *buttonFont = nil;
     return self;
 }
 
-- (void) dealloc 
+- (void) dealloc
 {
     [_view release];
     [_buttons release];
@@ -167,11 +179,12 @@ static UIFont *buttonFont = nil;
     NSUInteger tag = 1;
     for (NSDictionary *buttonProperties in _buttons)
     {
+        CGFloat actionSheetBorder = [_actionSheetStyle actionSheetBorder];
         UIButton *button = [self buttonWithProperties:buttonProperties tag:tag++];
         [button addTarget:self action:@selector(buttonClicked:) forControlEvents:UIControlEventTouchUpInside];
         [_view addSubview:button];
-        button.frame = CGRectMake(kActionSheetBorder, _height, _view.bounds.size.width-kActionSheetBorder*2, kActionSheetButtonHeight);
-        _height += kActionSheetButtonHeight + kActionSheetBorder;
+        button.frame = CGRectMake(actionSheetBorder, _height, _view.bounds.size.width-actionSheetBorder*2, [_actionSheetStyle actionSheetButtonHeight]);
+        _height += [_actionSheetStyle actionSheetButtonHeight] + actionSheetBorder;
     }
     
     UIImageView *modalBackground = [[UIImageView alloc] initWithFrame:_view.bounds];
@@ -180,15 +193,16 @@ static UIFont *buttonFont = nil;
     [_view insertSubview:modalBackground atIndex:0];
     [modalBackground release];
     
+    CGFloat actionSheetBounce = [_actionSheetStyle actionSheetBounce];
     [BlockBackground sharedInstance].vignetteBackground = _vignetteBackground;
     [[BlockBackground sharedInstance] addToMainWindow:_view];
     CGRect frame = _view.frame;
     frame.origin.y = [BlockBackground sharedInstance].bounds.size.height;
-    frame.size.height = _height + kActionSheetBounce;
+    frame.size.height = _height + actionSheetBounce;
     _view.frame = frame;
     
     __block CGPoint center = _view.center;
-    center.y -= _height + kActionSheetBounce;
+    center.y -= _height + actionSheetBounce;
     
     [UIView animateWithDuration:0.4
                           delay:0.0
@@ -201,7 +215,7 @@ static UIFont *buttonFont = nil;
                                                delay:0.0
                                              options:UIViewAnimationOptionAllowUserInteraction
                                           animations:^{
-                                              center.y += kActionSheetBounce;
+                                              center.y += actionSheetBounce;
                                               _view.center = center;
                                           } completion:nil];
                      }];
@@ -215,20 +229,21 @@ static UIFont *buttonFont = nil;
 
     UIImage *image = [UIImage imageNamed:[self imageNameForType:type]];
     image = [image stretchableImageWithLeftCapWidth:(int)(image.size.width)>>1 topCapHeight:0];
-
+    
+    CGFloat actionSheetBorder = [_actionSheetStyle actionSheetBorder];
     UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
-    button.frame = CGRectMake(kActionSheetBorder, _height, _view.bounds.size.width-kActionSheetBorder*2, kActionSheetButtonHeight);
+    button.frame = CGRectMake(actionSheetBorder, _height, _view.bounds.size.width-actionSheetBorder*2, [_actionSheetStyle actionSheetButtonHeight]);
     button.titleLabel.font = buttonFont;
     button.titleLabel.minimumFontSize = 6;
     button.titleLabel.adjustsFontSizeToFitWidth = YES;
     button.titleLabel.textAlignment = UITextAlignmentCenter;
-    button.titleLabel.shadowOffset = kActionSheetButtonShadowOffset;
+    button.titleLabel.shadowOffset = [_actionSheetStyle actionSheetButtonShadowOffset];
     button.backgroundColor = [UIColor clearColor];
     button.tag = tag;
 
     [button setBackgroundImage:image forState:UIControlStateNormal];
-    [button setTitleColor:kActionSheetButtonTextColor forState:UIControlStateNormal];
-    [button setTitleShadowColor:kActionSheetButtonShadowColor forState:UIControlStateNormal];
+    [button setTitleColor:[_actionSheetStyle actionSheetButtonTextColor] forState:UIControlStateNormal];
+    [button setTitleShadowColor:[_actionSheetStyle actionSheetButtonShadowColor] forState:UIControlStateNormal];
     [button setTitle:title forState:UIControlStateNormal];
     button.accessibilityLabel = title;
 
@@ -274,6 +289,8 @@ static UIFont *buttonFont = nil;
     }
     isClosing = YES;
     [[BlockBackground sharedInstance] removeView:_view];
+    [_actionSheetStyle release];
+    _actionSheetStyle = nil;
     [_view release];
     _view = nil;
     [self autorelease];

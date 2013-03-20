@@ -4,6 +4,7 @@
 //
 
 #import <UIKit/UIKit.h>
+@class BlockActionSheetStyle;
 
 typedef enum {
     BlockActionSheetButtonTypeNormal,
@@ -30,10 +31,13 @@ typedef void (^ActionBlock)();
 @property (nonatomic, readonly) UIView *view;
 @property (nonatomic, readwrite) BOOL vignetteBackground;
 @property (nonatomic, readonly) BOOL isVisible;
+@property (nonatomic, retain) BlockActionSheetStyle *actionSheetStyle;
 
 + (id)sheetWithTitle:(NSString *)title;
++ (id)sheetWithTitle:(NSString *)title andStyle:(BlockActionSheetStyle *)style;
 
 - (id)initWithTitle:(NSString *)title;
+- (id)initWithTitle:(NSString *)title andStyle:(BlockActionSheetStyle *)style;
 
 - (void)setCancelButtonWithTitle:(NSString *) title block:(ActionBlock) block;
 - (void)setDestructiveButtonWithTitle:(NSString *) title block:(ActionBlock) block;

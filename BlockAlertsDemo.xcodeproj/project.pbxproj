@@ -7,6 +7,8 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		5622B1BD16F9EAD2009A0AE7 /* BlockActionSheetStyle.m in Sources */ = {isa = PBXBuildFile; fileRef = 5622B1BA16F9EAD1009A0AE7 /* BlockActionSheetStyle.m */; };
+		5622B1BE16F9EAD2009A0AE7 /* BlockAlertViewStyle.m in Sources */ = {isa = PBXBuildFile; fileRef = 5622B1BC16F9EAD2009A0AE7 /* BlockAlertViewStyle.m */; };
 		EC90169F14BB629F00EF52E1 /* UIKit.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC90169E14BB629F00EF52E1 /* UIKit.framework */; };
 		EC9016A114BB629F00EF52E1 /* Foundation.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC9016A014BB629F00EF52E1 /* Foundation.framework */; };
 		EC9016A314BB629F00EF52E1 /* CoreGraphics.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = EC9016A214BB629F00EF52E1 /* CoreGraphics.framework */; };
@@ -50,6 +52,10 @@
 /* End PBXBuildFile section */
 
 /* Begin PBXFileReference section */
+		5622B1B916F9EAD1009A0AE7 /* BlockActionSheetStyle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BlockActionSheetStyle.h; sourceTree = "<group>"; };
+		5622B1BA16F9EAD1009A0AE7 /* BlockActionSheetStyle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BlockActionSheetStyle.m; sourceTree = "<group>"; };
+		5622B1BB16F9EAD1009A0AE7 /* BlockAlertViewStyle.h */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.h; path = BlockAlertViewStyle.h; sourceTree = "<group>"; };
+		5622B1BC16F9EAD2009A0AE7 /* BlockAlertViewStyle.m */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.c.objc; path = BlockAlertViewStyle.m; sourceTree = "<group>"; };
 		EC90169A14BB629F00EF52E1 /* BlockAlertsDemo.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = BlockAlertsDemo.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		EC90169E14BB629F00EF52E1 /* UIKit.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = UIKit.framework; path = System/Library/Frameworks/UIKit.framework; sourceTree = SDKROOT; };
 		EC9016A014BB629F00EF52E1 /* Foundation.framework */ = {isa = PBXFileReference; lastKnownFileType = wrapper.framework; name = Foundation.framework; path = System/Library/Frameworks/Foundation.framework; sourceTree = SDKROOT; };
@@ -232,6 +238,10 @@
 		ECFC5EF514EB1DA4004BFD45 /* ToAddToYourProjects */ = {
 			isa = PBXGroup;
 			children = (
+				5622B1B916F9EAD1009A0AE7 /* BlockActionSheetStyle.h */,
+				5622B1BA16F9EAD1009A0AE7 /* BlockActionSheetStyle.m */,
+				5622B1BB16F9EAD1009A0AE7 /* BlockAlertViewStyle.h */,
+				5622B1BC16F9EAD2009A0AE7 /* BlockAlertViewStyle.m */,
 				ECFC5EF614EB1DA4004BFD45 /* BlockActionSheet.h */,
 				ECFC5EF714EB1DA4004BFD45 /* BlockActionSheet.m */,
 				ECFC5EF814EB1DA4004BFD45 /* BlockAlertView.h */,
@@ -342,6 +352,8 @@
 				ECFC5EFF14EB1DA4004BFD45 /* BlockAlertView.m in Sources */,
 				ECFC5F0014EB1DA4004BFD45 /* BlockBackground.m in Sources */,
 				ECFC5F0114EB1DA4004BFD45 /* BlockTextPromptAlertView.m in Sources */,
+				5622B1BD16F9EAD2009A0AE7 /* BlockActionSheetStyle.m in Sources */,
+				5622B1BE16F9EAD2009A0AE7 /* BlockAlertViewStyle.m in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
