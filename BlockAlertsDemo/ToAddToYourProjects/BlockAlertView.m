@@ -32,7 +32,7 @@ static UIFont *buttonFont = nil;
 
 - (id)initWithTitle:(NSString *)title message:(NSString *)message
 {
-    return [self initWithTitle:title message:message style:[[BlockAlertViewStyle alloc] init]];
+    return [self initWithTitle:title message:message style:[[[BlockAlertViewStyle alloc] init] autorelease]];
 }
 
 - (id)initWithTitle:(NSString *)title message:(NSString *)message style:(BlockAlertViewStyle *)style

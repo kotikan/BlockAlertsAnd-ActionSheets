@@ -35,12 +35,12 @@ static UIFont *buttonFont = nil;
 
 + (id)sheetWithTitle:(NSString *)title andStyle:(BlockActionSheetStyle *)style
 {
-    return [[BlockActionSheet alloc] initWithTitle:title andStyle:style];
+    return [[[BlockActionSheet alloc] initWithTitle:title andStyle:style] autorelease];
 }
 
 - (id)initWithTitle:(NSString *)title
 {
-    BlockActionSheetStyle *style = [[BlockActionSheetStyle alloc] init];
+    BlockActionSheetStyle *style = [[[BlockActionSheetStyle alloc] init] autorelease];
     return [self initWithTitle:title andStyle:style];
 }
 
