@@ -16,6 +16,9 @@
 
 @implementation BlockActionSheet {
     BOOL isClosing;
+    UIView *headerView;
+    int transparentBackgroundRegionOffset;
+    UILabel *labelView;
 }
 
 @synthesize view = _view;
@@ -71,7 +74,7 @@ static UIFont *buttonFont = nil;
                             constrainedToSize:CGSizeMake(frame.size.width-actionSheetBorder*2, 1000)
                                 lineBreakMode:UILineBreakModeWordWrap];
             
-            UILabel *labelView = [[UILabel alloc] initWithFrame:CGRectMake(actionSheetBorder, _height, frame.size.width-actionSheetBorder*2, size.height)];
+            labelView = [[UILabel alloc] initWithFrame:CGRectMake(actionSheetBorder, _height, frame.size.width-actionSheetBorder*2, size.height)];
             labelView.font = titleFont;
             labelView.numberOfLines = 0;
             labelView.lineBreakMode = UILineBreakModeWordWrap;
@@ -173,10 +176,26 @@ static UIFont *buttonFont = nil;
     return [NSString stringWithFormat:@"action-%@-button.png", color];
 }
 
+- (void)addHeaderView:(UIView *)aHeaderView withTransparentBackgroundRegionOffset:(int)offset {
+    [aHeaderView retain];
+    headerView = aHeaderView;
+    transparentBackgroundRegionOffset = offset;
+}
+
 - (void)showInView:(UIView *)view
 {
     self.isVisible = YES;
     NSUInteger tag = 1;
+    
+    if (headerView) {
+        [_view addSubview:headerView];
+        _height += CGRectGetHeight(headerView.frame);
+        
+        CGRect frame = headerView.frame;
+        frame.origin.y += transparentBackgroundRegionOffset;
+        headerView.frame = frame;
+    }
+    
     for (NSDictionary *buttonProperties in _buttons)
     {
         CGFloat actionSheetBorder = [_actionSheetStyle actionSheetBorder];
@@ -187,7 +206,17 @@ static UIFont *buttonFont = nil;
         _height += [_actionSheetStyle actionSheetButtonHeight] + actionSheetBorder;
     }
     
-    UIImageView *modalBackground = [[UIImageView alloc] initWithFrame:_view.bounds];
+    CGRect backgroundBounds = _view.bounds;
+    
+    if (headerView) {
+        backgroundBounds.origin.y = CGRectGetHeight(headerView.frame);
+        
+        CGRect frame = labelView.frame;
+        frame.origin.y += CGRectGetHeight(headerView.frame);
+        labelView.frame = frame;
+    }
+    
+    UIImageView *modalBackground = [[UIImageView alloc] initWithFrame:backgroundBounds];
     modalBackground.image = background;
     modalBackground.contentMode = UIViewContentModeScaleToFill;
     [_view insertSubview:modalBackground atIndex:0];
@@ -289,6 +318,8 @@ static UIFont *buttonFont = nil;
     }
     isClosing = YES;
     [[BlockBackground sharedInstance] removeView:_view];
+    [headerView release];
+    headerView = nil;
     [_actionSheetStyle release];
     _actionSheetStyle = nil;
     [_view release];

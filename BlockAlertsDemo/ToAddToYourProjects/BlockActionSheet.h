@@ -49,6 +49,8 @@ typedef void (^ActionBlock)();
 - (void)setDestructiveButtonWithTitle:(NSString *) title atIndex:(NSInteger)index block:(ActionBlock) block;
 - (void)addButtonWithTitle:(NSString *) title atIndex:(NSInteger)index block:(ActionBlock) block;
 
+- (void)addHeaderView:(UIView *)headerView withTransparentBackgroundRegionOffset:(int)offset;
+
 - (void)showInView:(UIView *)view;
 - (NSUInteger)buttonCount;
 - (void)tearDownSheet;
