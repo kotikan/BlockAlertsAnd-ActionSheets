@@ -38,6 +38,7 @@ typedef void (^ActionBlock)();
 
 - (id)initWithTitle:(NSString *)title;
 - (id)initWithTitle:(NSString *)title andStyle:(BlockActionSheetStyle *)style;
+- (id)initWithTitle:(NSString *)title titleAccessibilityLabel:(NSString *)accLabel andStyle:(BlockActionSheetStyle *)style;
 
 - (void)setCancelButtonWithTitle:(NSString *) title block:(ActionBlock) block;
 - (void)setDestructiveButtonWithTitle:(NSString *) title block:(ActionBlock) block;

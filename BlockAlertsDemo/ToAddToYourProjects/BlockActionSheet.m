@@ -49,6 +49,10 @@ static UIFont *buttonFont = nil;
 
 - (id)initWithTitle:(NSString *)title andStyle:(BlockActionSheetStyle *)style
 {
+    return [self initWithTitle:title titleAccessibilityLabel:title andStyle:style];
+}
+
+- (id)initWithTitle:(NSString *)title titleAccessibilityLabel:(NSString *)accLabel andStyle:(BlockActionSheetStyle *)style {
     if ((self = [super init]))
     {
         [style retain];
@@ -84,6 +88,11 @@ static UIFont *buttonFont = nil;
             labelView.shadowColor = [_actionSheetStyle actionSheetTitleShadowColor];
             labelView.shadowOffset = [_actionSheetStyle actionSheetTitleShadowOffset];
             labelView.text = title;
+            labelView.accessibilityLabel = accLabel;
+            if ([[[UIDevice currentDevice] systemVersion] floatValue] >= 6.0) {
+                labelView.accessibilityTraits = UIAccessibilityTraitHeader;
+            }
+            
             [_view addSubview:labelView];
             [labelView release];
             
@@ -246,7 +255,12 @@ static UIFont *buttonFont = nil;
                                           animations:^{
                                               center.y += actionSheetBounce;
                                               _view.center = center;
-                                          } completion:nil];
+                                          } completion:^(BOOL finished) {
+                                              if (UIAccessibilityIsVoiceOverRunning()) {
+                                                  UIAccessibilityPostNotification(UIAccessibilityLayoutChangedNotification,
+                                                                                  labelView);
+                                              }
+                                          }];
                      }];
     
     [self retain];
