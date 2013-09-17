@@ -76,15 +76,15 @@ static UIFont *buttonFont = nil;
             CGFloat actionSheetBorder = [_actionSheetStyle actionSheetBorder];
             CGSize size = [title sizeWithFont:titleFont
                             constrainedToSize:CGSizeMake(frame.size.width-actionSheetBorder*2, 1000)
-                                lineBreakMode:UILineBreakModeWordWrap];
+                                lineBreakMode:NSLineBreakByWordWrapping];
             
             labelView = [[UILabel alloc] initWithFrame:CGRectMake(actionSheetBorder, _height, frame.size.width-actionSheetBorder*2, size.height)];
             labelView.font = titleFont;
             labelView.numberOfLines = 0;
-            labelView.lineBreakMode = UILineBreakModeWordWrap;
+            labelView.lineBreakMode = NSLineBreakByWordWrapping;
             labelView.textColor = [_actionSheetStyle actionSheetTitleTextColor];
             labelView.backgroundColor = [UIColor clearColor];
-            labelView.textAlignment = UITextAlignmentCenter;
+            labelView.textAlignment = NSTextAlignmentCenter;
             labelView.shadowColor = [_actionSheetStyle actionSheetTitleShadowColor];
             labelView.shadowOffset = [_actionSheetStyle actionSheetTitleShadowOffset];
             labelView.text = title;
@@ -277,9 +277,9 @@ static UIFont *buttonFont = nil;
     UIButton *button = [UIButton buttonWithType:UIButtonTypeCustom];
     button.frame = CGRectMake(actionSheetBorder, _height, _view.bounds.size.width-actionSheetBorder*2, [_actionSheetStyle actionSheetButtonHeight]);
     button.titleLabel.font = buttonFont;
-    button.titleLabel.minimumFontSize = 6;
+    button.titleLabel.minimumScaleFactor = 0.5f;
     button.titleLabel.adjustsFontSizeToFitWidth = YES;
-    button.titleLabel.textAlignment = UITextAlignmentCenter;
+    button.titleLabel.textAlignment = NSTextAlignmentCenter;
     button.titleLabel.shadowOffset = [_actionSheetStyle actionSheetButtonShadowOffset];
     button.backgroundColor = [UIColor clearColor];
     button.tag = tag;
