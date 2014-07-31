@@ -8,6 +8,34 @@
 #import "BlockUI.h"
 #import "BlockActionSheetStyle.h"
 
+@interface NSString (Sizing)
+
+- (CGSize)safeSizeWithFont:(UIFont*)font
+         constrainedToSize:(CGSize)size
+             lineBreakMode:(NSLineBreakMode)lineBreakMode;
+
+@end
+
+@implementation NSString (Sizing)
+
+- (CGSize)safeSizeWithFont:(UIFont*)font
+         constrainedToSize:(CGSize)size
+             lineBreakMode:(NSLineBreakMode)lineBreakMode  {
+    NSMutableParagraphStyle * paragraphStyle = [[NSMutableParagraphStyle defaultParagraphStyle] mutableCopy];
+    paragraphStyle.lineBreakMode = lineBreakMode;
+    NSDictionary * attributes = @{NSFontAttributeName: font,
+                                  NSParagraphStyleAttributeName: paragraphStyle};
+    CGRect textRect = [self boundingRectWithSize:size
+                                         options:NSStringDrawingUsesLineFragmentOrigin
+                                      attributes:attributes
+                                         context:nil];
+    CGSize exactSize = textRect.size;
+    CGSize roundedUpSize = CGSizeMake(ceilf(exactSize.width), ceilf(exactSize.height));
+    return roundedUpSize;
+}
+
+@end
+
 @interface BlockActionSheet ()
 
 @property (nonatomic, readwrite) BOOL isVisible;
@@ -74,9 +102,9 @@ static UIFont *buttonFont = nil;
         if (title)
         {
             CGFloat actionSheetBorder = [_actionSheetStyle actionSheetBorder];
-            CGSize size = [title sizeWithFont:titleFont
-                            constrainedToSize:CGSizeMake(frame.size.width-actionSheetBorder*2, 1000)
-                                lineBreakMode:NSLineBreakByWordWrapping];
+            CGSize size = [title safeSizeWithFont:titleFont
+                                constrainedToSize:CGSizeMake(frame.size.width-actionSheetBorder*2, 1000)
+                                    lineBreakMode:NSLineBreakByWordWrapping];
             
             labelView = [[UILabel alloc] initWithFrame:CGRectMake(actionSheetBorder, _height, frame.size.width-actionSheetBorder*2, size.height)];
             labelView.font = titleFont;

@@ -8,6 +8,14 @@
 #import "BlockUI.h"
 #import "BlockAlertViewStyle.h"
 
+@interface NSString (Sizing)
+
+- (CGSize)safeSizeWithFont:(UIFont*)font
+         constrainedToSize:(CGSize)size
+             lineBreakMode:(NSLineBreakMode)lineBreakMode;
+
+@end
+
 @implementation BlockAlertView
 
 @synthesize view = _view;
@@ -61,9 +69,9 @@ static UIFont *buttonFont = nil;
 
         if (title)
         {
-            CGSize size = [title sizeWithFont:titleFont
-                            constrainedToSize:CGSizeMake(frame.size.width-borderSize*2, 1000)
-                                lineBreakMode:NSLineBreakByWordWrapping];
+            CGSize size = [title safeSizeWithFont:titleFont
+                                constrainedToSize:CGSizeMake(frame.size.width-borderSize*2, 1000)
+                                    lineBreakMode:NSLineBreakByWordWrapping];
 
             UILabel *labelView = [[UILabel alloc] initWithFrame:CGRectMake(borderSize, _height, frame.size.width-borderSize*2, size.height)];
             labelView.font = titleFont;
@@ -83,9 +91,9 @@ static UIFont *buttonFont = nil;
         
         if (message)
         {
-            CGSize size = [message sizeWithFont:messageFont
-                              constrainedToSize:CGSizeMake(frame.size.width-borderSize*2, 1000)
-                                  lineBreakMode:NSLineBreakByWordWrapping];
+            CGSize size = [message safeSizeWithFont:messageFont
+                                  constrainedToSize:CGSizeMake(frame.size.width-borderSize*2, 1000)
+                                      lineBreakMode:NSLineBreakByWordWrapping];
             
             UILabel *labelView = [[UILabel alloc] initWithFrame:CGRectMake(borderSize, _height, frame.size.width-borderSize*2, size.height)];
             labelView.font = messageFont;
