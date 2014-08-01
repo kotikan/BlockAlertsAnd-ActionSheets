@@ -13,6 +13,11 @@
 - (CGSize)safeSizeWithFont:(UIFont*)font
          constrainedToSize:(CGSize)size
              lineBreakMode:(NSLineBreakMode)lineBreakMode;
+- (CGSize)safeFractionalSizeWithFont:(UIFont *)font
+                         minFontSize:(CGFloat)minFontSize
+                      actualFontSize:(CGFloat *)actualFontSize
+                            forWidth:(CGFloat)constrainedWidth
+                       lineBreakMode:(NSLineBreakMode)lineBreakMode;
 
 @end
 
@@ -180,23 +185,24 @@ static UIFont *buttonFont = nil;
         {
             // In this case there's another button.
             // Let's check if they fit on the same line.
-            CGSize size = [title sizeWithFont:buttonFont 
-                                  minFontSize:10 
-                               actualFontSize:nil
-                                     forWidth:_view.bounds.size.width-borderSize*2 
-                                lineBreakMode:NSLineBreakByClipping];
-            
+            CGSize size = [title safeFractionalSizeWithFont:buttonFont
+                                                minFontSize:10
+                                             actualFontSize:nil
+                                                   forWidth:_view.bounds.size.width-borderSize*2
+                                              lineBreakMode:NSLineBreakByClipping];
+            size = CGSizeMake(ceilf(size.width), ceilf(size.height));
             if (size.width < maxHalfWidth - borderSize)
             {
                 // It might fit. Check the next Button
                 NSArray *block2 = [_blocks objectAtIndex:i+1];
                 NSString *title2 = [block2 objectAtIndex:1];
-                size = [title2 sizeWithFont:buttonFont 
-                                minFontSize:10 
-                             actualFontSize:nil
-                                   forWidth:_view.bounds.size.width-borderSize*2 
-                              lineBreakMode:NSLineBreakByClipping];
-                
+                size = [title2 safeFractionalSizeWithFont:buttonFont
+                                              minFontSize:10
+                                           actualFontSize:nil
+                                                 forWidth:_view.bounds.size.width-borderSize*2
+                                            lineBreakMode:NSLineBreakByClipping];
+                size = CGSizeMake(ceilf(size.width), ceilf(size.height));
+
                 if (size.width < maxHalfWidth - borderSize)
                 {
                     // They'll fit!
@@ -208,11 +214,12 @@ static UIFont *buttonFont = nil;
         else if (_blocks.count  == 1)
         {
             // In this case this is the ony button. We'll size according to the text
-            CGSize size = [title sizeWithFont:buttonFont 
-                                  minFontSize:10 
-                               actualFontSize:nil
-                                     forWidth:_view.bounds.size.width-borderSize*2 
-                                lineBreakMode:NSLineBreakByClipping];
+            CGSize size = [title safeFractionalSizeWithFont:buttonFont
+                                                minFontSize:10
+                                             actualFontSize:nil
+                                                   forWidth:_view.bounds.size.width-borderSize*2
+                                              lineBreakMode:NSLineBreakByClipping];
+            size = CGSizeMake(ceilf(size.width), ceilf(size.height));
 
             size.width = MAX(size.width, 80);
             if (size.width + 2 * borderSize < width)

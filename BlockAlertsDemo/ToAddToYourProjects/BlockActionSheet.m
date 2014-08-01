@@ -34,6 +34,48 @@
     return roundedUpSize;
 }
 
+- (CGSize)safeFractionalSizeWithFont:(UIFont*)font
+                   constrainedToSize:(CGSize)size
+                       lineBreakMode:(NSLineBreakMode)lineBreakMode {
+    NSMutableParagraphStyle *paragraphStyle = [[NSMutableParagraphStyle defaultParagraphStyle] mutableCopy];
+    paragraphStyle.lineBreakMode = lineBreakMode;
+    NSDictionary * attributes = @{NSFontAttributeName: font,
+                                  NSParagraphStyleAttributeName: paragraphStyle};
+    CGRect textRect = [self boundingRectWithSize:size
+                                         options:NSStringDrawingUsesLineFragmentOrigin
+                                      attributes:attributes
+                                         context:nil];
+    return textRect.size;
+}
+
+- (CGSize)safeFractionalSizeWithFont:(UIFont *)font
+                         minFontSize:(CGFloat)minFontSize
+                      actualFontSize:(CGFloat *)actualFontSize
+                            forWidth:(CGFloat)constrainedWidth
+                       lineBreakMode:(NSLineBreakMode)lineBreakMode {
+    CGFloat fontSize = font.pointSize;
+    CGSize size = [self sizeWithAttributes:@{NSFontAttributeName: font}];
+    CGFloat initialHeight = size.height;
+    
+    while (size.width > constrainedWidth && fontSize > minFontSize) {
+        fontSize -= 0.5f;
+        UIFont *smallerFont = [UIFont fontWithName:font.fontName size:fontSize];
+        size = [self sizeWithAttributes:@{NSFontAttributeName: smallerFont}];
+    }
+    if (fontSize <= minFontSize) {
+        fontSize = minFontSize;
+        UIFont *smallerFont = [UIFont fontWithName:font.fontName size:fontSize];
+        CGSize maxSize = CGSizeMake(constrainedWidth, initialHeight);
+        size = [self safeFractionalSizeWithFont:smallerFont
+                              constrainedToSize:maxSize
+                                  lineBreakMode:lineBreakMode];
+    }
+    *actualFontSize = fontSize;
+    size.height = initialHeight;
+    
+    return size;
+}
+
 @end
 
 @interface BlockActionSheet ()
